@@ -7,9 +7,16 @@ public class MovementController : MonoBehaviour
     Vector3 _movementSpeed = new Vector3(20, 20);
     Vector3 _deltaPos = new Vector3();
     const float MIN_LIM_Y = -4.25f, MAX_LIM_Y = 4.25f, MIN_LIM_X = -8.25f, MAX_LIM_X = 8.25f;
+    ScoreManager _scoreManager;
+
+    void Awake()
+    {
+        _scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+    }
 
     void Update()
     {
+
         _deltaPos.x = Input.GetAxis("Horizontal") * _movementSpeed.x;
         _deltaPos.y = Input.GetAxis("Vertical") * _movementSpeed.y;
         _deltaPos *= Time.deltaTime;
@@ -25,6 +32,41 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(other.gameObject);
+        if (other.gameObject.CompareTag("Square"))
+        {
+            gameObject.GetComponent<Renderer>().material = other.gameObject.GetComponent<Renderer>().material;
+            Destroy(other.gameObject);
+        }
+        else
+        {
+
+        }
+
+        if (other.gameObject.CompareTag("Sphere"))
+        {
+            if (other.gameObject.GetComponent<Renderer>().material.color == gameObject.GetComponent<Renderer>().material.color)
+            {
+                _scoreManager.IncrementScore();
+            }
+            else
+            {
+                _scoreManager.DecrementLives();
+            }
+
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Lives"))
+        {
+            _scoreManager.IncrementLives();
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Speed"))
+        {
+            GameManager.IncrementSpeed();
+            Destroy(other.gameObject);
+        }
+
     }
 }
